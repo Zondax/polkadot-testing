@@ -1,3 +1,6 @@
 [submodule "polkadot-sdk"]
 	path = polkadot-sdk
 	url = https://github.com/Zondax/polkadot-sdk.git
+[submodule "polkadot-testing-p2p"]
+	path = polkadot-testing-p2p
+	url = https://github.com/Zondax/polkadot-testing-p2p
