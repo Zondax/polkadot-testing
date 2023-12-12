@@ -1,5 +1,14 @@
 # Polkadot Conformance Testing
 
+---
+
+![zondax_light](docs/zondax_light.png#gh-light-mode-only)
+![zondax_dark](docs/zondax_dark.png#gh-dark-mode-only)
+
+_Please visit our website at [zondax.ch](https://www.zondax.ch)_
+
+---
+
 This repository is a comprehensive collection of Zondax's research and work on Polkadot conformance testing.
 
 A detailed report, which includes the findings and conclusions, is available in the `docs/` directory.
