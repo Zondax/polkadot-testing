@@ -4,3 +4,6 @@
 [submodule "polkadot-testing-p2p"]
 	path = polkadot-testing-p2p
 	url = https://github.com/Zondax/polkadot-testing-p2p
+[submodule "Polkadot-conformance-tests"]
+	path = Polkadot-conformance-tests
+	url = https://github.com/Zondax/Polkadot-conformance-tests
