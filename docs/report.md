@@ -143,13 +143,20 @@ In terms of testing levels, these efforts can be classified into unit testing, i
 
 In conclusion, a future solution should aim to address these challenges while leveraging the advantages of previous efforts. It should be language and interface agnostic, provide a comprehensive evaluation of the node, require minimal modifications to the node, and cover all levels of testing.
 
-In the subsequent subsections, we will explore various testing methodologies applied to Polkadot host node implementations. These include testing through RPC endpoints, testing the host API with a specific runtime, unit testing, and integration tests using P2P messages. Each method offers unique insights and presents its own set of challenges, which we will discuss in detail to provide a comprehensive understanding of their implications for future testing efforts.
+In the subsequent subsections, we will explore various testing methodologies applied to Polkadot host node implementations. These include:
+
+- Testing through RPC endpoints
+- Testing the host API with a specific runtime
+- Unit testing
+- Integration tests using P2P messages
+
+Each method offers unique insights and presents its own set of challenges, which we will discuss in detail to provide a comprehensive understanding of their implications for future testing efforts.
 
 ### Testing throught RPC endpoints
 
 Our initial approach to testing Polkadot host node implementations extended the work done by the Web3 Foundation (W3F), which utilized the Foreign Function Interface (FFI) to test parts of the code using a Julia script. However, maintaining FFI for three different implementations in three different languages proved to be a significant challenge.
 
-An alternative approach suggested was to create special RPC endpoints directly in the node code. This method was implemented on the Polkadot node in Rust, and involved writing tests for the SCALE encoding and the State Trie Hash, building a special node, and testing it using Python scripts.
+An alternative approach suggested was to create special RPC endpoints directly in the node code. This method was implemented on the Polkadot node in Rust([Source Code](https://github.com/Zondax/polkadot-sdk/blob/zondax/polkadot/zondax/src/lib.rs)), and involved writing Python [tests](https://github.com/Zondax/Polkadot-conformance-tests) for the SCALE encoding, the State Trie Hash. This endpoint is not enable by default but through a custom compilation flag.
 
 Despite its success, this approach had limitations. The tests were not directly examining the implementation but were rewriting some code using the same library for this endpoint. This meant that the tests were not able to access more in-depth code due to multiple layers. Additionally, navigating a source code as extensive as the Polkadot SDK was time-consuming and challenging.
 
@@ -163,9 +170,9 @@ However, we encountered challenges with this approach. The complexity of mapping
 
 This issue became particularly evident when multiple calls to the host-api occurred as a result of a single invocation by the runtime during the processing of new blocks or extrinsics. This situation contradicted our goal of ensuring that the node's host-api implementation aligns with the specification's definitions for each method, arguments, and return types.
 
-Given these challenges, we reconsidered our initial strategy. We concluded that employing a custom RPC endpoint remains a beneficial means to isolate the node's implementation from our testing framework. However, to effectively assess the host-api implementation independently—without triggering unrelated runtime method calls during the process—significant modifications were necessary.
+Given these challenges, we reconsidered our initial strategy. We concluded that employing a custom [RPC endpoint](https://github.com/Zondax/polkadot-sdk/blob/zondax/polkadot/zondax/src/lib.rs#L131-L144) remains a beneficial means to isolate the node's implementation from our testing framework. However, to effectively assess the host-api implementation independently—without triggering unrelated runtime method calls during the process—significant modifications were necessary.
 
-Therefore, we decided to adapt the runtime by integrating additional exported methods. These methods are designed to precisely redirect a call to its associated host-api method, thereby establishing a direct one-to-one correlation between the runtime and host-api. This enhancement simplifies the process of unit testing the host implementation by ensuring that each test is self-contained and interacts exclusively with the intended host-api functionality.
+Therefore, we decided to adapt the runtime by integrating [additional](https://github.com/Zondax/polkadot-sdk/blob/zondax/polkadot/runtime/polkadot/src/lib.rs#L1640-L1647) exported methods. These methods are designed to precisely redirect a call to its associated host-api method, thereby establishing a direct one-to-one correlation between the runtime and host-api. This enhancement simplifies the process of unit testing the host implementation by ensuring that each test is self-contained and interacts exclusively with the intended host-api functionality.
 
 We later realized that developing these new exported methods in the runtime was not as difficult as initially thought. They are relatively simple, as they just consist of making a call to the host-api. Below is a short description of the RPC endpoint compatible with our test suite.
 
@@ -210,6 +217,8 @@ impl self::ZondaxTest<Block> for Runtime {
 ```
 
 The code snippet above, named storage_runtime, demonstrates the minimal extent of modifications required to integrate three new exported methods into Polkadot's runtime. These changes were implemented specifically for the purpose of testing the storage host-api. For more information on the host-api and its role in the Polkadot ecosystem, please refer to the @PolkadotDocs.
+
+For instructions on how to run the test suite for host-api refer to the [appendix](#executing-rpc-tests) at the end of this document.
 
 #### **Advantages of the Host_API RPC Endpoint**
 
