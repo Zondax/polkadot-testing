@@ -8,7 +8,6 @@ toc-own-page: true
 author:
   - Lola Rigaut-Luczak (Zondax AG)
   - Natanael Mojica (Zondax AG)
-
 # titlepage-text-color: "FFFFFF"
 # titlepage-rule-color: "360049"
 # titlepage-rule-height: 0
@@ -17,6 +16,7 @@ author:
 ---
 
 <!-- markdownlint-disable-next-line -->
+
 # Polkadot Hosts: Conformance Testing
 
 ## Abstract
@@ -58,8 +58,6 @@ The Polkadot conformance testsuite ([Source Code](https://github.com/w3f/polkado
 Implemented in the Julia language, the testsuite leveraged the Foreign Function Interface (FFI) to interact with functions and data types from the three Polkadot implementations. Julia was chosen for its ability to easily interface with libraries from other languages, a crucial feature for testing implementations written in different programming languages.
 
 Despite its comprehensive nature, the project was archived in September 2023 and is no longer maintained. The reasons for this are not publicly documented, but it's possible that the maintenance overhead, coupled with the complexity of keeping up with the evolving Polkadot specification, contributed to this decision.
-
-The W3F Polkadot testsuite, though no longer active, serves as a valuable reference for understanding the complexities involved in testing Polkadot implementations and the approaches that can be used to tackle them.
 
 #### Strengths
 
@@ -348,13 +346,14 @@ We are currently developing a test suite as a proof of concept. This suite is ex
 This multi-faceted approach, combining the strengths of RPC, unit testing, and libp2p methods, alongside the emerging test suite, is poised to significantly enhance the robustness and reliability of the Polkadot network. Our proof of concept aims to evolve into a comprehensive solution, ensuring that discrepancies in node implementations do not disrupt the network's harmony and performance.
 
 <!-- markdownlint-disable-next-line -->
+
 # Supplementary Information
 
 This section provides further details, resources, and references that supplement the primary content of this report, offering a deeper understanding of the discussed methodologies and their implications.
 
 ## Executing RPC Tests
 
-This section provides a comprehensive guide for executing the tests that serve as a Proof of Concept (PoC) for testing the Polkadot host API. 
+This section provides a comprehensive guide for executing the tests that serve as a Proof of Concept (PoC) for testing the Polkadot host API.
 At present, these instructions are specifically tailored for the official Rust implementation of Polkadot.
 
 ### Prerequisites
