@@ -8,7 +8,6 @@ toc-own-page: true
 author:
   - Lola Rigaut-Luczak (Zondax AG)
   - Natanael Mojica (Zondax AG)
-
 # titlepage-text-color: "FFFFFF"
 # titlepage-rule-color: "360049"
 # titlepage-rule-height: 0
@@ -17,6 +16,7 @@ author:
 ---
 
 <!-- markdownlint-disable-next-line -->
+
 # Polkadot Hosts: Conformance Testing
 
 ## Abstract
@@ -58,8 +58,6 @@ The Polkadot conformance testsuite ([Source Code](https://github.com/w3f/polkado
 Implemented in the Julia language, the testsuite leveraged the Foreign Function Interface (FFI) to interact with functions and data types from the three Polkadot implementations. Julia was chosen for its ability to easily interface with libraries from other languages, a crucial feature for testing implementations written in different programming languages.
 
 Despite its comprehensive nature, the project was archived in September 2023 and is no longer maintained. The reasons for this are not publicly documented, but it's possible that the maintenance overhead, coupled with the complexity of keeping up with the evolving Polkadot specification, contributed to this decision.
-
-The W3F Polkadot testsuite, though no longer active, serves as a valuable reference for understanding the complexities involved in testing Polkadot implementations and the approaches that can be used to tackle them.
 
 #### Strengths
 
@@ -145,13 +143,20 @@ In terms of testing levels, these efforts can be classified into unit testing, i
 
 In conclusion, a future solution should aim to address these challenges while leveraging the advantages of previous efforts. It should be language and interface agnostic, provide a comprehensive evaluation of the node, require minimal modifications to the node, and cover all levels of testing.
 
-In the subsequent subsections, we will explore various testing methodologies applied to Polkadot host node implementations. These include testing through RPC endpoints, testing the host API with a specific runtime, unit testing, and integration tests using P2P messages. Each method offers unique insights and presents its own set of challenges, which we will discuss in detail to provide a comprehensive understanding of their implications for future testing efforts.
+In the subsequent subsections, we will explore various testing methodologies applied to Polkadot host node implementations. These include:
+
+- Testing through RPC endpoints
+- Testing the host API with a specific runtime
+- Unit testing
+- Integration tests using P2P messages
+
+Each method offers unique insights and presents its own set of challenges, which we will discuss in detail to provide a comprehensive understanding of their implications for future testing efforts.
 
 ### Testing throught RPC endpoints
 
 Our initial approach to testing Polkadot host node implementations extended the work done by the Web3 Foundation (W3F), which utilized the Foreign Function Interface (FFI) to test parts of the code using a Julia script. However, maintaining FFI for three different implementations in three different languages proved to be a significant challenge.
 
-An alternative approach suggested was to create special RPC endpoints directly in the node code. This method was implemented on the Polkadot node in Rust, and involved writing tests for the SCALE encoding and the State Trie Hash, building a special node, and testing it using Python scripts.
+An alternative approach suggested was to create special RPC endpoints directly in the node code. This method was implemented on the Polkadot node in Rust([Source Code](https://github.com/Zondax/polkadot-sdk/blob/zondax/polkadot/zondax/src/lib.rs)), and involved writing Python [tests](https://github.com/Zondax/Polkadot-conformance-tests) for the SCALE encoding, the State Trie Hash. This endpoint is not enable by default but through a custom compilation flag.
 
 Despite its success, this approach had limitations. The tests were not directly examining the implementation but were rewriting some code using the same library for this endpoint. This meant that the tests were not able to access more in-depth code due to multiple layers. Additionally, navigating a source code as extensive as the Polkadot SDK was time-consuming and challenging.
 
@@ -165,9 +170,9 @@ However, we encountered challenges with this approach. The complexity of mapping
 
 This issue became particularly evident when multiple calls to the host-api occurred as a result of a single invocation by the runtime during the processing of new blocks or extrinsics. This situation contradicted our goal of ensuring that the node's host-api implementation aligns with the specification's definitions for each method, arguments, and return types.
 
-Given these challenges, we reconsidered our initial strategy. We concluded that employing a custom RPC endpoint remains a beneficial means to isolate the node's implementation from our testing framework. However, to effectively assess the host-api implementation independently—without triggering unrelated runtime method calls during the process—significant modifications were necessary.
+Given these challenges, we reconsidered our initial strategy. We concluded that employing a custom [RPC endpoint](https://github.com/Zondax/polkadot-sdk/blob/zondax/polkadot/zondax/src/lib.rs#L131-L144) remains a beneficial means to isolate the node's implementation from our testing framework. However, to effectively assess the host-api implementation independently—without triggering unrelated runtime method calls during the process—significant modifications were necessary.
 
-Therefore, we decided to adapt the runtime by integrating additional exported methods. These methods are designed to precisely redirect a call to its associated host-api method, thereby establishing a direct one-to-one correlation between the runtime and host-api. This enhancement simplifies the process of unit testing the host implementation by ensuring that each test is self-contained and interacts exclusively with the intended host-api functionality.
+Therefore, we decided to adapt the runtime by integrating [additional](https://github.com/Zondax/polkadot-sdk/blob/zondax/polkadot/runtime/polkadot/src/lib.rs#L1640-L1647) exported methods. These methods are designed to precisely redirect a call to its associated host-api method, thereby establishing a direct one-to-one correlation between the runtime and host-api. This enhancement simplifies the process of unit testing the host implementation by ensuring that each test is self-contained and interacts exclusively with the intended host-api functionality.
 
 We later realized that developing these new exported methods in the runtime was not as difficult as initially thought. They are relatively simple, as they just consist of making a call to the host-api. Below is a short description of the RPC endpoint compatible with our test suite.
 
@@ -212,6 +217,8 @@ impl self::ZondaxTest<Block> for Runtime {
 ```
 
 The code snippet above, named storage_runtime, demonstrates the minimal extent of modifications required to integrate three new exported methods into Polkadot's runtime. These changes were implemented specifically for the purpose of testing the storage host-api. For more information on the host-api and its role in the Polkadot ecosystem, please refer to the @PolkadotDocs.
+
+For instructions on how to run the test suite for host-api refer to the [appendix](#executing-rpc-tests) at the end of this document.
 
 #### **Advantages of the Host_API RPC Endpoint**
 
@@ -348,13 +355,14 @@ We are currently developing a test suite as a proof of concept. This suite is ex
 This multi-faceted approach, combining the strengths of RPC, unit testing, and libp2p methods, alongside the emerging test suite, is poised to significantly enhance the robustness and reliability of the Polkadot network. Our proof of concept aims to evolve into a comprehensive solution, ensuring that discrepancies in node implementations do not disrupt the network's harmony and performance.
 
 <!-- markdownlint-disable-next-line -->
+
 # Supplementary Information
 
 This section provides further details, resources, and references that supplement the primary content of this report, offering a deeper understanding of the discussed methodologies and their implications.
 
 ## Executing RPC Tests
 
-This section provides a comprehensive guide for executing the tests that serve as a Proof of Concept (PoC) for testing the Polkadot host API. 
+This section provides a comprehensive guide for executing the tests that serve as a Proof of Concept (PoC) for testing the Polkadot host API.
 At present, these instructions are specifically tailored for the official Rust implementation of Polkadot.
 
 ### Prerequisites
