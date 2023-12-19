@@ -23,8 +23,6 @@ author:
 
 This report presents a comprehensive study on the conformance testing of Polkadot host node implementations. It delves into the importance of ensuring consistent behavior across all host implementations, the challenges involved, and the potential solutions. The report also reviews previous efforts in this domain, providing insights into their strengths and shortcomings. Furthermore, it discusses the testing of various aspects of the Polkadot protocol, including the host API, storage, and cryptographic functionalities. The report concludes with recommendations for future testing efforts, emphasizing the need for rigorous testing and strict adherence to the Polkadot specification document.
 
-TODO: add a table of contents. Use pandoc to export to pdf and/or latex.
-
 ## Introduction
 
 Polkadot, a flagship protocol of the Web3 Foundation, serves as an ecosystem for facilitating an interconnected, interoperable, and secure Web3 environment[@PolkadotDocs]. It is a complex software system, with its formal implementation built on top of a tech stack. The Polkadot ecosystem comprises various implementations of the Polkadot protocol, each contributing to the overarching goal of decentralization.
